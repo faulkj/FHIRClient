@@ -16,9 +16,7 @@
    ],
    "type" : "library",
    "require" : {
-      "php" : ">=7.0"
-   },
-   "require" : {
+      "php" : ">=7.0",
       "faulkj/webclient" : "1.*"
    },
    "require-dev" : {
