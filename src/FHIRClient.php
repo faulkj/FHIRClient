@@ -1,14 +1,16 @@
 <?php namespace FaulkJ\FHIRClient;
    /*
-    * FHIR Client Class v1.1
+    * FHIR Client Class v1.2
     * Extends WebClient
     *
-    * Kopimi 2021 Joshua Faulkenberry
+    * Kopimi 2022 Joshua Faulkenberry
     * Unlicensed under The Unlicense
     * http://unlicense.org/
     */
 
-   class FHIRClient extends \FaulkJ\WebClient\WebClient {
+   use \FaulkJ\WebClient\WebClient;
+
+   class FHIRClient extends WebClient {
 
       private $clientID;
       private $redirectURI;
@@ -92,13 +94,16 @@
       }
 
       public function getAuthCode($launch = null, $challenge = null, $challengeMethod = null, $scope = "launch") {
+         $base = explode("/", $this->authURI)[0];
          $params = [
             "response_type" => "code",
             "client_id"     => $this->clientID,
             "redirect_uri"  => $this->redirectURI,
             "scope"         => $scope,
-            "state"         => $this->state
+            "state"         => $this->state,
+            "aud"           => "{$this->protocol}://{$this->host}/{$base}"
          ];
+
          if($launch) $params["launch"] = $launch;
          if($challenge) $params["challenge"] = $challenge;
          if($challengeMethod) $params["challengeMethod"] = $challengeMethod;
