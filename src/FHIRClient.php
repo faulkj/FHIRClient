@@ -94,16 +94,15 @@
       }
 
       public function getAuthCode($launch = null, $challenge = null, $challengeMethod = null, $scope = "launch") {
-         $base = explode("/", $this->authURI)[0];
          $params = [
             "response_type" => "code",
             "client_id"     => $this->clientID,
             "redirect_uri"  => $this->redirectURI,
             "scope"         => $scope,
-            "state"         => $this->state,
-            "aud"           => "{$this->protocol}://{$this->host}/{$base}"
+            "state"         => $this->state
          ];
 
+         if($this->tokenURI) $params["aud"] = "{$this->protocol}://{$this->host}/{$this->tokenURI}";
          if($launch) $params["launch"] = $launch;
          if($challenge) $params["challenge"] = $challenge;
          if($challengeMethod) $params["challengeMethod"] = $challengeMethod;
