@@ -1,5 +1,5 @@
 # FHIRClient
-A simple PHP client for SMART on FHIR
+A simple PHP client for SMART on FHIR, the standard API for integrating applications with any modern healthcare system.
 
 ### Installation
 ```bash
