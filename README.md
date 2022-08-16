@@ -29,8 +29,7 @@ $fhir->getConformance($_GET["iss"]);
 $fhir->getAuthCode();
 ```
 
-This will first get an Conformance Statement/SMART Configuration from _my.fhirserver.com/FHIRProxy/api/FHIR/R4_ to retrieve the authorization and token endpoints.  
-This will request an authorization code from the authorization endpoint, triggering a redirect to _my.website.com_.
+This will first get an Conformance Statement/SMART Configuration from _my.fhirserver.com/FHIRProxy/api/FHIR/R4_ to retrieve the authorization and token endpoints.  It will then request an authorization code from the authorization endpoint, triggering a redirect to _my.website.com_.
 
 On _my.website.com_ when redirected:
 ```php
