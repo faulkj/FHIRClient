@@ -1,7 +1,8 @@
 # FHIRClient Changelog
 
-[2022-?] Version 1.2
+[2022-8-15] Version 1.2
    - Add aud (audience) parameter to getAuthCode
+   - Fixes for CLI mode
 
 [2021-09-09] Version 1.1
    - Initial public release
