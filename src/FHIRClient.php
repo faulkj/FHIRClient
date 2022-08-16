@@ -18,6 +18,7 @@
       private $tokenURI;
       private $iss;
       private $param;
+      private $status        = "initializing";
       private $authenticated = false;
       private $state         = null;
       private $secret        = null;
@@ -117,6 +118,8 @@
                "client_assertion"      => $this->createJWT()
             ];
 
+            if(!$postData["client_assertion"]) return false;
+
             $reqData = [
                "target" => $this->tokenURI,
                "method" => "post",
@@ -148,6 +151,7 @@
                $param->tokenURI = $this->tokenURI;
             }
             $param->expires = time() + $param->expires_in;
+            $this->param = $param;
             $this->session("param", $param, $this->state);
             $this->session("tokenURI", null);
             $this->authenticated = true;
@@ -247,8 +251,8 @@
             "jti" => uniqid(time(), true),
             "exp" => time() + (5 * 60)
          ]);
-
-         if($pkeyid = openssl_pkey_get_private(strpos($this->signingKey, "-----BEGIN RSA PRIVATE KEY-----") !== false ? $this->signingKey : "file://{$this->signingKey}")) {
+         if($this->debug) var_dump(file_get_contents($this->signingKey));
+         if($pkeyid = openssl_pkey_get_private(file_get_contents($this->signingKey))) {
             $signature = null;
             $data = base64url_encode($header) . "." . base64url_encode($payload);
             if(openssl_sign($data, $signature, $pkeyid, "RSA-SHA384")) {
