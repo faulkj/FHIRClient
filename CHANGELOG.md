@@ -1,6 +1,6 @@
 # FHIRClient Changelog
 
-[2022-8-15] Version 2.0
+[2022-10-06] Version 2.0
    - Fixed namespacing
    - Combined construct parameters into single options parameter
    - Switched authenticated parameter to status
