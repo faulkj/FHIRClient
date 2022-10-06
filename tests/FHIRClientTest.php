@@ -32,7 +32,7 @@ d9uykmX3IZIQLEZ16FfH40u+juYxdYhU9kYCfr6xZefTHntV7bUweiDbmEfX25Xb
 o3IeAQKBgQDyHZCHq/rjtJ1NqGCvk1HOq5pfYugDP0KShEdOgfEulBDTDGs5jZ9+
 84IY97wpute11zJrVKEKNnoLo50f5+hDV2DYS6oLW+TLL01h/xkp2xFt3YZNkEox
 vxzZy4uJov/ORBEb4IUif1O1zUR/MRbCuWq39Em7eErU09k6wF6J8g==
------END RSA PRIVATE KEY-----", null, null, null, "v/r4/auth/token");
+-----END RSA PRIVATE KEY-----", ["tokenURI" => "v/r4/auth/token"]);
          $this->assertTrue(is_object($var));
          unset($var);
       }

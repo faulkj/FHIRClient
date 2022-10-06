@@ -25,7 +25,7 @@
 
       public function __construct(string $host, string $clientID, string $redirectURI, $options = []) {
          $this->clientID = $clientID;
-         foreach($options as $opt => $val) if(isset($this->$opt)) $this->$opt = $val;
+         foreach($options as $opt => $val) if(isset($this->$opt) || is_null($this->$opt)) $this->$opt = $val;
          $this->cliMode  = php_sapi_name() === "cli";
 
          if(strpos($redirectURI, "http://") === 0 || strpos($redirectURI, "https://") === 0) $this->redirectURI = $redirectURI;
