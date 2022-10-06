@@ -3,6 +3,7 @@
 [2022-8-15] Version 2.0
    - Fixed namespacing
    - Combined construct parameters into single options parameter
+   - Switched authenticated parameter to status
 
 [2022-8-15] Version 1.2
    - Add aud (audience) parameter to getAuthCode

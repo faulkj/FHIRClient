@@ -17,7 +17,6 @@
       private $iss;
       private $param;
       private $status        = "initializing";
-      private $authenticated = false;
       private $state         = null;
       private $secret        = null;
       private $scope         = null;
@@ -25,13 +24,8 @@
       private $cliMode       = false;
 
       public function __construct(string $host, string $clientID, string $redirectURI, $options = []) {
-         $options = (object) $options;
          $this->clientID = $clientID;
-         $this->secret   = $options->secret || null;
-         $this->state    = $options->state || null;
-         $this->authURI  = $options->authURI || null;
-         $this->tokenURI = $options->tokenURI || null;
-         $this->scope    = $options->scope || null;
+         foreach($options as $opt => $val) if(isset($this->$opt)) $this->$opt = $val;
          $this->cliMode  = php_sapi_name() === "cli";
 
          if(strpos($redirectURI, "http://") === 0 || strpos($redirectURI, "https://") === 0) $this->redirectURI = $redirectURI;
@@ -39,7 +33,10 @@
 
          if(!$this->cliMode && session_status() == PHP_SESSION_NONE) session_start();
 
-         if($this->session("tokenURI") && !$tokenURI) $this->tokenURI = $this->session("tokenURI");
+         if($this->session("tokenURI") && !$tokenURI) {
+            $this->status = "authenticating";
+            $this->tokenURI = $this->session("tokenURI");
+         }
          else if($this->tokenURI) $this->session("tokenURI", $this->tokenURI);
          if($this->session("iss")) $this->iss = $this->session("iss");
 
@@ -49,18 +46,18 @@
                if($this->param->expires < time()) {
                   $this->param = null;
                   $this->session("param", false, $this->state, false, true);
-                  $this->authenticated = false;
+                  $this->status = "expired";
                }
-               else $this->authenticated = true;
+               else $this->status = "authenticated";
             }
             else if(is_object($this->session("param"))) {
                $this->param = $this->session("param");
                if($this->param->expires < time()) {
                   $this->param = null;
                   $this->session("param", false, false, false, true);
-                  $this->authenticated = false;
+                  $this->status = "expired";
                }
-               else $this->authenticated = true;
+               else $this->status = "authenticated";
             }
          }
 
@@ -156,7 +153,7 @@
             $this->param = $param;
             $this->session("param", $param, $this->state);
             $this->session("tokenURI", null);
-            $this->authenticated = true;
+            $this->status = "authenticated";
          }
          else {
             trigger_error("Unable to retreive FHIR access token!");
@@ -209,11 +206,15 @@
       }
 
       public function authenticated() {
-         return $this->authenticated;
+         return $this->status == "authenticated";
       }
 
       public function state() {
          return $this->state;
+      }
+
+      public function status() {
+         return $this->status;
       }
 
       public function param($p = null) {
@@ -222,7 +223,7 @@
       }
 
       public function query($params) {
-         if(!$this->authenticated) trigger_error("Attempting to query when not authenticated.");
+         if($this->status != "authenticated") trigger_error("Attempting to query when not authenticated.");
          if(is_string($params)) $params = [
             "target" => $params
          ];
