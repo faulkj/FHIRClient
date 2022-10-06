@@ -15,7 +15,7 @@ On initial load:
 ```php
 //Assumining this is the URL loaded by the EMR:  https://my.website.com/launch/?iss=https://my.fhirserver.com/FHIRProxy/api/FHIR/R4&launch=abc123
 
-use FaulkJ\FHIRClient\FHIRClient;
+use FaulkJ\FHIRClient;
 session_start();
 
 $iss = parse_url($_GET["iss"]);
@@ -33,7 +33,7 @@ This will first get an Conformance Statement/SMART Configuration from _my.fhirse
 
 On _my.website.com_ when redirected:
 ```php
-use FaulkJ\FHIRClient\FHIRClient;
+use FaulkJ\FHIRClient;
 session_start();
 
 $fc = new FHIRClient(...$_SESSION["fhirParams"]);
@@ -46,7 +46,7 @@ if($obs->code == 200) echo $obs->body;
 
 On subsequent page loads or AJAX calls, the FHIRClient will need to be reinstanciated before yoy can send a query:
 ```php
-use FaulkJ\FHIRClient\FHIRClient;
+use FaulkJ\FHIRClient;
 session_start();
 
 $fc = new FHIRClient(...$_SESSION["fhirParams"]);
@@ -59,19 +59,19 @@ if($pat->code == 200) echo $pat->body;
 
 On initial load:
 ```php
-use FaulkJ\FHIRClient\FHIRClient;
+use FaulkJ\FHIRClient;
 session_start();
 
 $iss = parse_url($_GET["iss"]);
 $_SESSION["fhirParams"] = [
    "https:/my.fhirserver.com",
-   "1234-5678-9012-3456-7890", 
+   "1234-5678-9012-3456-7890",
    "https://my.website.com",
-   null,
-   base64_encode(rand()),
-   "FHIRProxy/oauth2/authorize",
-   "FHIRProxy/oauth2/token"
-   
+   [
+      "state"    => base64_encode(rand()),
+      "authURI"  => "FHIRProxy/oauth2/authorize",
+      "tokenURI" => "FHIRProxy/oauth2/token"
+   ]
 ];
 $fc = new FHIRClient(...$_SESSION["fhirParams"]);
 $fc->getConformance($_GET["iss"]);
@@ -81,7 +81,7 @@ This example includes a randomly generated _state_ parameter and will request an
 
 On _my.website.com_ when redirected:
 ```php
-use FaulkJ\FHIRClient\FHIRClient;
+use FaulkJ\FHIRClient;
 session_start();
 
 $fc = new FHIRClient(...$_SESSION["fhirParams"]);
@@ -94,7 +94,7 @@ if($obs->code == 200) echo $obs->body;
 
 On subsequent page loads or AJAX calls, the FHIRClient will need to be reinstanciated before yoy can send a query:
 ```php
-use FaulkJ\FHIRClient\FHIRClient;
+use FaulkJ\FHIRClient;
 session_start();
 
 $fc = new FHIRClient(...$_SESSION["fhirParams"]);
@@ -105,16 +105,15 @@ if($pat->code == 200) echo $pat->body;
 ### Backend Mode
 
 ```php
-use FaulkJ\FHIRClient\FHIRClient;
+use FaulkJ\FHIRClient;
 
 $fc = (new FHIRClient(
    "https:/fhir.server.com",
    "1234-5678-9012-3456-7890",
    "D:\\privatekey.pem",
-   null,
-   null,
-   null,
-   "FHIRProxy/oauth2/token"
+   [
+      "tokenURI" => "FHIRProxy/oauth2/token"
+   ]
 ))->debug(true);
 
 $fc->getAccessToken();

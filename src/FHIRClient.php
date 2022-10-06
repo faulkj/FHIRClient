@@ -1,14 +1,12 @@
-<?php namespace FaulkJ\FHIRClient;
+<?php namespace FaulkJ;
    /*
-    * FHIR Client Class v1.2
+    * FHIR Client Class v2.0
     * Extends WebClient
     *
     * Kopimi 2022 Joshua Faulkenberry
     * Unlicensed under The Unlicense
     * http://unlicense.org/
     */
-
-   use \FaulkJ\WebClient\WebClient;
 
    class FHIRClient extends WebClient {
 
@@ -22,16 +20,19 @@
       private $authenticated = false;
       private $state         = null;
       private $secret        = null;
+      private $scope         = null;
       private $signingKey    = null;
       private $cliMode       = false;
 
-      public function __construct($host, $clientID, $redirectURI, $secret = null, $state = null, $authURI = null, $tokenURI = null) {
+      public function __construct(string $host, string $clientID, string $redirectURI, $options = []) {
+         $options = (object) $options;
          $this->clientID = $clientID;
-         $this->secret   = $secret;
-         $this->state    = $state;
-         $this->authURI  = $authURI;
-         $this->tokenURI = $tokenURI;
-         $this->cliMode  = php_sapi_name() === 'cli';
+         $this->secret   = $options->secret || null;
+         $this->state    = $options->state || null;
+         $this->authURI  = $options->authURI || null;
+         $this->tokenURI = $options->tokenURI || null;
+         $this->scope    = $options->scope || null;
+         $this->cliMode  = php_sapi_name() === "cli";
 
          if(strpos($redirectURI, "http://") === 0 || strpos($redirectURI, "https://") === 0) $this->redirectURI = $redirectURI;
          else $this->signingKey = $redirectURI;
@@ -95,6 +96,7 @@
       }
 
       public function getAuthCode($launch = null, $challenge = null, $challengeMethod = null, $scope = "launch") {
+         if($this->scope) $scope = $this->scope;
          $params = [
             "response_type" => "code",
             "client_id"     => $this->clientID,

@@ -1,7 +1,7 @@
 <?php
 
    use PHPUnit\Framework\TestCase,
-       FaulkJ\FHIRClient\FHIRClient;
+       FaulkJ\FHIRClient;
 
    class FHIRClientTest extends TestCase {
 
