@@ -1,5 +1,8 @@
 # FHIRClient Changelog
 
+[2022-10-12] Version 2.1
+   - Moved redirectURI and signingKey into options parameter
+
 [2022-10-06] Version 2.0
    - Fixed namespacing
    - Combined construct parameters into single options parameter

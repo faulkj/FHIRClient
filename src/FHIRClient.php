@@ -23,13 +23,10 @@
       private $signingKey    = null;
       private $cliMode       = false;
 
-      public function __construct(string $host, string $clientID, string $redirectURI, $options = []) {
+      public function __construct(string $host, string $clientID, $options = []) {
          $this->clientID = $clientID;
          foreach($options as $opt => $val) if(isset($this->$opt) || is_null($this->$opt)) $this->$opt = $val;
          $this->cliMode  = php_sapi_name() === "cli";
-
-         if(strpos($redirectURI, "http://") === 0 || strpos($redirectURI, "https://") === 0) $this->redirectURI = $redirectURI;
-         else $this->signingKey = $redirectURI;
 
          if(!$this->cliMode && session_status() == PHP_SESSION_NONE) session_start();
 
