@@ -26,7 +26,7 @@
       public function __construct(string $host, string $clientID, $options = []) {
          $this->clientID = $clientID;
          foreach($options as $opt => $val) if(isset($this->$opt) || is_null($this->$opt)) $this->$opt = $val;
-         $this->cliMode  = php_sapi_name() === "cli";
+         $this->cliMode = php_sapi_name() === "cli";
 
          if(!$this->cliMode && session_status() == PHP_SESSION_NONE) session_start();
 
