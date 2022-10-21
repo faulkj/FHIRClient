@@ -16,7 +16,7 @@
    "license" : "Unlicense",
    "type" : "library",
    "require" : {
-      "php" : ">=7.0",
+      "php" : ">=8.0",
       "faulkj/webclient" : "1.1.*"
    },
    "require-dev" : {

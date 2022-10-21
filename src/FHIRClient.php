@@ -1,6 +1,6 @@
 <?php namespace FaulkJ;
    /*
-    * FHIR Client Class v2.0
+    * FHIR Client Class v2.1.1
     * Extends WebClient
     *
     * Kopimi 2022 Joshua Faulkenberry
@@ -30,7 +30,7 @@
 
          if(!$this->cliMode && session_status() == PHP_SESSION_NONE) session_start();
 
-         if($this->session("tokenURI") && !$tokenURI) {
+         if($this->session("tokenURI") && !isset($this->tokenURI)) {
             $this->status = "authenticating";
             $this->tokenURI = $this->session("tokenURI");
          }
