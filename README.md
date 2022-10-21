@@ -22,7 +22,9 @@ $iss = parse_url($_GET["iss"]);
 $_SESSION["fhirParams"] = [
    "{$iss['scheme']}://{$iss['host']}",
    "1234-5678-9012-3456-7890",
-   "https://my.website.com"
+   [
+      "redirectURI" => "https://my.website.com"
+   ]
 ];
 $fhir = new FHIRClient(...$_SESSION["fhirParams"]);
 $fhir->getConformance($_GET["iss"]);
@@ -66,11 +68,11 @@ $iss = parse_url($_GET["iss"]);
 $_SESSION["fhirParams"] = [
    "https:/my.fhirserver.com",
    "1234-5678-9012-3456-7890",
-   "https://my.website.com",
    [
-      "state"    => base64_encode(rand()),
-      "authURI"  => "FHIRProxy/oauth2/authorize",
-      "tokenURI" => "FHIRProxy/oauth2/token"
+      "state"       => base64_encode(rand()),
+      "redirectURI" => "https://my.website.com",
+      "authURI"     => "FHIRProxy/oauth2/authorize",
+      "tokenURI"    => "FHIRProxy/oauth2/token"
    ]
 ];
 $fc = new FHIRClient(...$_SESSION["fhirParams"]);
@@ -110,9 +112,9 @@ use FaulkJ\FHIRClient;
 $fc = (new FHIRClient(
    "https:/fhir.server.com",
    "1234-5678-9012-3456-7890",
-   "D:\\privatekey.pem",
    [
-      "tokenURI" => "FHIRProxy/oauth2/token"
+      "signingKey" => "D:\\privatekey.pem",
+      "tokenURI"   => "FHIRProxy/oauth2/token"
    ]
 ))->debug(true);
 
