@@ -1,5 +1,8 @@
 # FHIRClient Changelog
 
+***2024-5-16*** Version 3.0
+   - Massive overhaul to state and session management
+
 ***2022-10-12*** Version 2.1.1
    - Fix reference to legacy tokenURI parameter
 
