@@ -23,7 +23,6 @@ class FHIRClient extends WebClient {
    private $cliMode      = false;
    private $state        = null;
    private $secret       = null;
-   private $scope        = null;
    private $signingKey   = null;
    private $statusChangedCallback = null;
    private $statuses     = [
@@ -42,9 +41,8 @@ class FHIRClient extends WebClient {
 
       if (!$this->cliMode && session_status() == PHP_SESSION_NONE) session_start();
 
-      if ($this->sessionHost("tokenURI") && !isset($this->tokenURI)) {
-         $this->tokenURI = $this->sessionHost("tokenURI");
-      } else if ($this->tokenURI) $this->sessionHost("tokenURI", $this->tokenURI);
+      if ($this->sessionHost("tokenURI") && !isset($this->tokenURI)) $this->tokenURI = $this->sessionHost("tokenURI");
+      else if ($this->tokenURI) $this->sessionHost("tokenURI", $this->tokenURI);
 
       if ($this->sessionHost("iss")) $this->iss = $this->sessionHost("iss");
 
@@ -91,21 +89,23 @@ class FHIRClient extends WebClient {
       return $this;
    }
 
-   public function getAuthCode($launch = null, $challenge = null, $challengeMethod = null, $scope = "launch") {
-      if ($this->scope) $scope = $this->scope;
+   public function getAuthCode(array | object $options = []) {
+      $options = (object) $options;
+
       $params = [
-         "response_type" => "code",
-         "client_id"     => $this->clientID,
-         "redirect_uri"  => $this->redirectURI,
-         "scope"         => $scope,
-         "state"         => $this->state
+         'client_id'       => $this->clientID,
+         'redirect_uri'    => $this->redirectURI,
+         'aud'             => $this->tokenURI ? "{$this->protocol}://{$this->host}/{$this->tokenURI}" : null,
+         'state'           => $this->state,
+         'response_type'   => 'code',
+         'scope'           => 'launch',
+         'launch'          => null,
+         'challenge'       => null,
+         'challengeMethod' => null
       ];
 
-      if ($this->tokenURI) $params["aud"] = "{$this->protocol}://{$this->host}/{$this->tokenURI}";
-      if ($launch) $params["launch"] = $launch;
-      if ($challenge) $params["challenge"] = $challenge;
-      if ($challengeMethod) $params["challengeMethod"] = $challengeMethod;
-
+      if ($options->params) $params = array_merge($params, $options->params);
+      if (isset($options->redirect) && $options->redirect != true) return "{$this->protocol}://{$this->host}/{$this->authURI}?" . http_build_query($params);
       die(header("Location: {$this->protocol}://{$this->host}/{$this->authURI}?" . http_build_query($params)));
    }
 
@@ -226,7 +226,7 @@ class FHIRClient extends WebClient {
    public function query($params) {
       $this->status != 3 && throw new \Exception("Attempting to query when not authenticated.");
       if (is_string($params)) $params = [ "target" => $params ];
-      if ($params['version']) {
+      if (isset($params['version'])) {
          preg_match('/^(.*?\/?api)(?:\/|$)/', $this->iss, $matches);
          $params["target"] = "{$matches[1]}/{$params['version']}/{$params["target"]}";
       } else $params["target"] = "{$this->iss}/{$params["target"]}";
@@ -291,7 +291,8 @@ class FHIRClient extends WebClient {
    }
 
    private function &sessionHost($parameter = null, $value = false) {
-      $session = $this->initSession();
+      static $null = null;
+      $session = &$this->initSession();
 
       if ($parameter === null) return $session;
       else if ($value === false) {
@@ -299,12 +300,10 @@ class FHIRClient extends WebClient {
             $result = &$session->$parameter;
             return $result;
          } else {
-            static $null = null;
             return $null;
          }
       } else if ($value === null) {
          unset($session->$parameter);
-         static $null = null;
          return $null;
       } else {
          $session->$parameter = $value;
@@ -314,7 +313,8 @@ class FHIRClient extends WebClient {
    }
 
    private function &sessionParam($parameter = true, $value = false) {
-      $session = $this->initSession();
+      static $null = null;
+      $session = &$this->initSession();
       $clear = function () use ($session) {
          if ($this->state) unset($session->param[$this->state]);
          else unset($session->param);
@@ -338,7 +338,6 @@ class FHIRClient extends WebClient {
          }
       } else if ($parameter === null) $clear();
       else if ($value === false) {
-         static $null = null;
          if (isset($this->param->$parameter)) {
             $result = &$this->param->$parameter;
             return $result;
@@ -347,7 +346,6 @@ class FHIRClient extends WebClient {
          }
       } else if ($value === null) {
          unset($this->param->$parameter);
-         static $null = null;
          return $null;
       } else {
          $this->param->$parameter = $value;
