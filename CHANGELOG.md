@@ -3,6 +3,7 @@
 ***2024-5-22*** Version 3.0
    - Massive overhauls to state and session management
    - Converted getAuthCode args to options object
+   - Various tweaks and improvements
 
 ***2022-10-12*** Version 2.1.1
    - Fix reference to legacy tokenURI parameter
