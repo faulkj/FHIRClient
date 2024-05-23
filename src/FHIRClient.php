@@ -1,15 +1,13 @@
-<?php
-
-namespace FaulkJ;
+<?php namespace FaulkJ;
 
 /*
-    * FHIR Client Class v3.0
-    * Extends WebClient
-    *
-    * Kopimi 2024 Joshua Faulkenberry
-    * Unlicensed under The Unlicense
-    * http://unlicense.org/
-    */
+ * FHIR Client Class v3.0
+ * Extends WebClient
+ *
+ * Kopimi 2024 Joshua Faulkenberry
+ * Unlicensed under The Unlicense
+ * http://unlicense.org/
+ */
 
 class FHIRClient extends WebClient {
 
@@ -43,6 +41,9 @@ class FHIRClient extends WebClient {
 
       if ($this->sessionHost("tokenURI") && !isset($this->tokenURI)) $this->tokenURI = $this->sessionHost("tokenURI");
       else if ($this->tokenURI) $this->sessionHost("tokenURI", $this->tokenURI);
+
+      if ($this->sessionHost("authURI") && !isset($this->authURI)) $this->authURI = $this->sessionHost("tokenURI");
+      else if ($this->authURI) $this->sessionHost("authURI", $this->authURI);
 
       if ($this->sessionHost("iss")) $this->iss = $this->sessionHost("iss");
 
@@ -84,6 +85,7 @@ class FHIRClient extends WebClient {
 
       if (!$this->authURI) throw new \Exception("No authorization URL!");
 
+      $this->sessionHost("authURI", $this->authURI);
       $this->sessionHost("tokenURI", $this->tokenURI);
       $this->status(1);
       return $this;
@@ -103,10 +105,15 @@ class FHIRClient extends WebClient {
          'challenge'       => null,
          'challengeMethod' => null
       ];
+      if (isset($options->params)) $params = array_merge($params, $options->params);
 
-      if ($options->params) $params = array_merge($params, $options->params);
-      if (isset($options->redirect) && $options->redirect != true) return "{$this->protocol}://{$this->host}/{$this->authURI}?" . http_build_query($params);
-      die(header("Location: {$this->protocol}://{$this->host}/{$this->authURI}?" . http_build_query($params)));
+      if (!$this->authURI) throw new \Exception("No authorization URL!");
+
+      $redirectTo = "{$this->protocol}://{$this->host}/{$this->authURI}?" . http_build_query($params);
+
+      if ($this->debug) die("\n\n{$redirectTo}");
+      if (isset($options->redirect) && $options->redirect != true) return $redirectTo;
+      else die(header("Location: {$redirectTo}"));
    }
 
    public function getAccessToken($code = null, $verifier = null) {
@@ -310,6 +317,7 @@ class FHIRClient extends WebClient {
          $result = &$session->$parameter;
          return $result;
       }
+      return $null;
    }
 
    private function &sessionParam($parameter = true, $value = false) {
@@ -352,5 +360,8 @@ class FHIRClient extends WebClient {
          $result = &$this->param->$parameter;
          return $result;
       }
+      return $null;
    }
 }
+
+?>
