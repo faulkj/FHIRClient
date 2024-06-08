@@ -1,6 +1,10 @@
 # FHIRClient Changelog
 
-***2024-5-22*** Version 3.0
+***2024-06-08*** Version 3.0.1
+   - Fix broken authURI session
+   - Cleanup
+
+***2024-05-22*** Version 3.0
    - Massive overhauls to state and session management
    - Converted getAuthCode args to options object
    - Various tweaks and improvements

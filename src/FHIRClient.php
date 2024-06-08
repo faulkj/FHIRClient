@@ -42,7 +42,7 @@ class FHIRClient extends WebClient {
       if ($this->sessionHost("tokenURI") && !isset($this->tokenURI)) $this->tokenURI = $this->sessionHost("tokenURI");
       else if ($this->tokenURI) $this->sessionHost("tokenURI", $this->tokenURI);
 
-      if ($this->sessionHost("authURI") && !isset($this->authURI)) $this->authURI = $this->sessionHost("tokenURI");
+      if ($this->sessionHost("authURI") && !isset($this->authURI)) $this->authURI = $this->sessionHost("authURI");
       else if ($this->authURI) $this->sessionHost("authURI", $this->authURI);
 
       if ($this->sessionHost("iss")) $this->iss = $this->sessionHost("iss");
@@ -306,9 +306,8 @@ class FHIRClient extends WebClient {
          if (isset($session->$parameter)) {
             $result = &$session->$parameter;
             return $result;
-         } else {
-            return $null;
          }
+         else return $null;
       } else if ($value === null) {
          unset($session->$parameter);
          return $null;
@@ -337,21 +336,17 @@ class FHIRClient extends WebClient {
          $this->param = &$session->param;
       }
 
-      if ($parameter === true) {
-         return $this->param;
-      } else if ($parameter === null && $value !== false) {
+      if ($parameter === true) return $this->param;
+      else if ($parameter === null && $value !== false) {
          $clear();
-         foreach ((array)$value as $key => $val) {
-            $this->sessionParam($key, $val);
-         }
+         foreach ((array)$value as $key => $val) $this->sessionParam($key, $val);
       } else if ($parameter === null) $clear();
       else if ($value === false) {
          if (isset($this->param->$parameter)) {
             $result = &$this->param->$parameter;
             return $result;
-         } else {
-            return $null;
          }
+         else return $null;
       } else if ($value === null) {
          unset($this->param->$parameter);
          return $null;
@@ -363,5 +358,3 @@ class FHIRClient extends WebClient {
       return $null;
    }
 }
-
-?>
